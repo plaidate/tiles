@@ -149,8 +149,7 @@ local function entities()
     for i = 1, #Game.enemies do
         local e = Game.enemies[i]
         if not e.stun or frame % 4 < 2 then
-            local img = S[e.kind == "boss" and "boss" or e.kind]
-            Spr.draw(img, e.x, e.y + math.sin((e.t or 0) * 4) * 1.5)
+            Spr.draw(S[e.kind], e.x, e.y + math.sin((e.t or 0) * 4) * 1.5)
         end
     end
     for i = 1, #Game.ebullets do

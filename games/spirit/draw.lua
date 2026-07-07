@@ -96,8 +96,7 @@ local function entities()
     for i = 1, #Game.enemies do
         local e = Game.enemies[i]
         if not e.spawning or frame % 4 < 2 then
-            local img = S[e.kind == "ghost" and "ghost"
-                or e.kind == "spitter" and "spitter" or "dasher"]
+            local img = S[e.kind]
             local flip = (e.kind == "dasher" and e.vx and e.vx < 0)
                 and gfx.kImageFlippedX or nil
             Spr.draw(img, e.x, e.y + math.sin((e.t or 0) * 4) * 2, flip)

@@ -343,7 +343,7 @@ function World.enter(key)
     local rows = buildRows(room)
     Map.load(rows, 0, 16)
     for cell in pairs(State.doors) do
-        local r, tx, ty = cell:match("^(%w+):(%d+),(%d+)$")
+        local r, tx, ty = cell:match("^([%w_]+):(%d+),(%d+)$")
         if r == key then
             Map.set(tonumber(tx), tonumber(ty), ".")
         end

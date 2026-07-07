@@ -5,6 +5,9 @@ would build for the NES, Game Boy, or C64: a fixed 16px tile grid,
 code-drawn tilesets and sprites, and per-game logic on a small shared
 core. No art assets — every tile and sprite is string art in Lua.
 
+**New here? Read the [player's manual](MANUAL.md)** — a section per game
+with controls, rules, enemies, and tips.
+
 | Game | One-liner | Crank |
 | --- | --- | --- |
 | [Blast](games/blast/) | Bomb the maze, trap the beasts (Bomberman-like) | fuse-length dial |
@@ -12,8 +15,12 @@ core. No art assets — every tile and sprite is string art in Lua.
 | [Relic](games/relic/) | Screen-flip action RPG: keys, dungeon, boss (Zelda-like) | wind up a spin attack |
 | [Burrow](games/burrow/) | Scrolling Boulder-Dash-style digger on a 640x448 cave | pan the camera to survey |
 
-Prebuilt games are in `dist/` — copy a `.pdx` onto your Playdate (or open
-it in the Simulator) and play.
+## Play it
+
+Prebuilt `.pdx` bundles for all four games are in `dist/` (and attached to
+each GitHub [Release](../../releases)). No toolchain needed: sideload a
+`.pdx.zip` at <https://play.date/account/sideload/>, or unzip it and drop
+the `.pdx` into the Playdate Simulator.
 
 ## Building
 
@@ -25,6 +32,6 @@ make all            # build everything
 tools/smoke.sh blast 240 '"wins":[1-9]'   # headless autopilot test
 ```
 
-Engine internals and the development workflow: [DEVELOPING.md](DEVELOPING.md).
+Engine internals and the development workflow: [DEVGUIDE.md](DEVGUIDE.md).
 
 MIT licensed.
