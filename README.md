@@ -1,5 +1,7 @@
 # Tiles
 
+> Part of **[plAIdate](https://plaidate.github.io)** — AI-built 1-bit games, ports, and engines for the Playdate.
+
 Original 1-bit tile-and-sprite games for the Playdate, built the way you
 would build for the NES, Game Boy, or C64: a fixed 16px tile grid,
 code-drawn tilesets and sprites, and per-game logic on a small shared
