@@ -2,5 +2,5 @@ name=Relic
 author=sdwfrost
 description=Sword, keys, boomerang. The relic sleeps below the hills.
 bundleID=com.sdwfrost.tiles.relic
-version=1.0
+version=0.1
 buildNumber=1

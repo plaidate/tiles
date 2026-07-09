@@ -2,5 +2,5 @@ name=Burrow
 author=sdwfrost
 description=Dig deep, bank the gems, never stand under a rock.
 bundleID=com.sdwfrost.tiles.burrow
-version=1.0
+version=0.1
 buildNumber=1
