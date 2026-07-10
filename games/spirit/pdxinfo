@@ -1,6 +1,7 @@
 name=Spirit
-author=sdwfrost
+author=Simon Frost
 description=Talismans against the yokai tide. Spin the wand when they close in.
 bundleID=com.sdwfrost.tiles.spirit
 version=0.1
-buildNumber=1
+buildNumber=2
+imagePath=launcher

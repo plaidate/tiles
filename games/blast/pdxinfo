@@ -1,6 +1,7 @@
 name=Blast
-author=sdwfrost
+author=Simon Frost
 description=Bomb the crates. Trap the beasts. Mind your own fuse.
 bundleID=com.sdwfrost.tiles.blast
 version=0.1
-buildNumber=1
+buildNumber=2
+imagePath=launcher
