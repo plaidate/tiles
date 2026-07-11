@@ -3,5 +3,5 @@ author=Simon Frost
 description=Dig deep, bank the gems, never stand under a rock.
 bundleID=com.sdwfrost.tiles.burrow
 version=0.1
-buildNumber=2
+buildNumber=3
 imagePath=launcher
