@@ -118,6 +118,14 @@ function Kit.updateShake(dt)
     end
 end
 
+function Kit.applyShake()
+    gfx.setDrawOffset(Kit.sx, Kit.sy)
+end
+
+function Kit.doneShake()
+    gfx.setDrawOffset(0, 0)
+end
+
 -- bold player locator: bobbing black-outlined white chevron above (x, y),
 -- drawn after everything else so the player never vanishes into dither
 function Kit.marker(x, y, t)
@@ -129,11 +137,50 @@ function Kit.marker(x, y, t)
     gfx.fillTriangle(x - 3, sy - 7, x + 3, sy - 7, x, sy - 2)
 end
 
--- run a painter list of {y=, fn=, arg=}
+-- run a painter list of {y=, fn=, arg=}; insertion order breaks y ties
+-- (table.sort is unstable) so equal-y actors never Z-flicker
 function Kit.drawSorted(list)
-    table.sort(list, function(a, b) return a.y < b.y end)
+    for i = 1, #list do list[i].seq = list[i].seq or i end
+    table.sort(list, function(a, b)
+        if a.y == b.y then return a.seq < b.seq end
+        return a.y < b.y
+    end)
     for i = 1, #list do
         local d = list[i]
         d.fn(d.arg)
+    end
+end
+
+-- Kit.run{ init=, extra=, shotPath= }: the shared main loop. Owns the
+-- refresh rate, the random seed, the Harness wiring and the frame counter;
+-- per frame it polls input, updates the game and pending callbacks, draws,
+-- and folds updMs/drwMs EMAs into the smoke counters.
+function Kit.run(opts)
+    playdate.display.setRefreshRate(SMOKE_BUILD and 0 or 30)
+    math.randomseed(playdate.getSecondsSinceEpoch())
+    if opts.init then opts.init() end
+    if Harness.enabled then
+        Harness.extra = opts.extra
+        if playdate.simulator then
+            Harness.shotPath = opts.shotPath
+        end
+    end
+    local frame = 0
+    local updMs, drwMs = 0, 0
+    local function tick()
+        Input.poll()
+        playdate.resetElapsedTime()
+        Game.update(Config.DT)
+        Util.runPending(Config.DT)
+        updMs = updMs * 0.95 + playdate.getElapsedTime() * 50
+        playdate.resetElapsedTime()
+        Draw.frame()
+        drwMs = drwMs * 0.95 + playdate.getElapsedTime() * 50
+        Harness.set("updMs", math.floor(updMs * 10) / 10)
+        Harness.set("drwMs", math.floor(drwMs * 10) / 10)
+    end
+    function playdate.update()
+        frame = frame + 1
+        Harness.frame(frame, tick)
     end
 end

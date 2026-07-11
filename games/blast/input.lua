@@ -12,11 +12,7 @@ function Input.poll()
         return
     end
     local pd = playdate
-    s.mx, s.my = 0, 0
-    if pd.buttonIsPressed(pd.kButtonLeft) then s.mx = -1 end
-    if pd.buttonIsPressed(pd.kButtonRight) then s.mx = 1 end
-    if pd.buttonIsPressed(pd.kButtonUp) then s.my = -1 end
-    if pd.buttonIsPressed(pd.kButtonDown) then s.my = 1 end
+    s.mx, s.my = Util.dpad()
     s.bomb = pd.buttonJustPressed(pd.kButtonA)
     s.confirm = pd.buttonJustPressed(pd.kButtonA)
     -- fold the dial so 0 deg (up) = shortest, 180 deg (down) = longest

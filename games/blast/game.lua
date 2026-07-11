@@ -11,6 +11,8 @@ Game = {
 
 local function key(tx, ty) return ty * 64 + tx end
 
+local DIRS = { { 1, 0 }, { -1, 0 }, { 0, 1 }, { 0, -1 } }
+
 function Game.init()
     State.reset()
     Arena.generate(1)
@@ -162,10 +164,9 @@ function Game.explode(b)
     Snd.boom(220, 3)
     Kit.shake(0.2)
     Game.flameCell(b.tx, b.ty)
-    local dirs = { { 1, 0 }, { -1, 0 }, { 0, 1 }, { 0, -1 } }
     for d = 1, 4 do
         for i = 1, b.power do
-            local tx, ty = b.tx + dirs[d][1] * i, b.ty + dirs[d][2] * i
+            local tx, ty = b.tx + DIRS[d][1] * i, b.ty + DIRS[d][2] * i
             local ch = Map.get(tx, ty)
             if ch == nil or ch == "#" or ch == "%" then break end
             if ch == "x" then
@@ -211,14 +212,13 @@ local function pickNext(e)
             return
         end
     end
-    local dirs = { { 1, 0 }, { -1, 0 }, { 0, 1 }, { 0, -1 } }
     local fwd, all = {}, {}
     for i = 1, 4 do
-        local dx, dy = dirs[i][1], dirs[i][2]
+        local dx, dy = DIRS[i][1], DIRS[i][2]
         if isOpenCell(tx + dx, ty + dy) then
-            all[#all + 1] = dirs[i]
+            all[#all + 1] = DIRS[i]
             if not (dx == -(e.pdx or 0) and dy == -(e.pdy or 0)) then
-                fwd[#fwd + 1] = dirs[i]
+                fwd[#fwd + 1] = DIRS[i]
             end
         end
     end
@@ -323,13 +323,12 @@ end
 -- blast coverage of an explicit bomb list (no flames)
 function Game.dangerCellsOf(bombs)
     local dang = {}
-    local dirs = { { 1, 0 }, { -1, 0 }, { 0, 1 }, { 0, -1 } }
     for j = 1, #bombs do
         local b = bombs[j]
         dang[key(b.tx, b.ty)] = true
         for d = 1, 4 do
             for i = 1, b.power do
-                local tx, ty = b.tx + dirs[d][1] * i, b.ty + dirs[d][2] * i
+                local tx, ty = b.tx + DIRS[d][1] * i, b.ty + DIRS[d][2] * i
                 local ch = Map.get(tx, ty)
                 if ch == nil or ch == "#" or ch == "%" then break end
                 dang[key(tx, ty)] = true
@@ -346,10 +345,9 @@ function Game.dangerCells(extra)
     for k in pairs(Game.flames) do dang[k] = true end
     local function blast(b)
         dang[key(b.tx, b.ty)] = true
-        local dirs = { { 1, 0 }, { -1, 0 }, { 0, 1 }, { 0, -1 } }
         for d = 1, 4 do
             for i = 1, b.power do
-                local tx, ty = b.tx + dirs[d][1] * i, b.ty + dirs[d][2] * i
+                local tx, ty = b.tx + DIRS[d][1] * i, b.ty + DIRS[d][2] * i
                 local ch = Map.get(tx, ty)
                 if ch == nil or ch == "#" or ch == "%" then break end
                 dang[key(tx, ty)] = true
@@ -491,11 +489,10 @@ function Game.autopilot(s)
     end
 
     -- bomb when a crate or an enemy sits in the blast line and escape exists
-    local dirs = { { 1, 0 }, { -1, 0 }, { 0, 1 }, { 0, -1 } }
     local wantBomb = false
     for d = 1, 4 do
         for i = 1, State.power do
-            local tx, ty = ptx + dirs[d][1] * i, pty + dirs[d][2] * i
+            local tx, ty = ptx + DIRS[d][1] * i, pty + DIRS[d][2] * i
             local ch = Map.get(tx, ty)
             if ch == nil or ch == "#" or ch == "%" then break end
             if ch == "x" then
@@ -528,7 +525,7 @@ function Game.autopilot(s)
                 local good = Game.powerAt(tx, ty) ~= nil
                 if not good then
                     for i = 1, 4 do
-                        if Map.get(tx + dirs[i][1], ty + dirs[i][2]) == "x" then
+                        if Map.get(tx + DIRS[i][1], ty + DIRS[i][2]) == "x" then
                             good = true
                             break
                         end

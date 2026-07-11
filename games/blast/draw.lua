@@ -122,12 +122,12 @@ end
 function Draw.frame()
     frame = frame + 1
     gfx.clear(gfx.kColorBlack)
-    gfx.setDrawOffset(Kit.sx, Kit.sy)
+    Kit.applyShake()
     Map.draw()
     if State.mode ~= "title" and Game.player then
         entities()
     end
-    gfx.setDrawOffset(0, 0)
+    Kit.doneShake()
     hud()
     if State.mode == "title" then
         Kit.title("BLAST", {

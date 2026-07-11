@@ -14,6 +14,7 @@ Harness = {
     autopilot = nil, -- game sets Harness.autopilot = function() ... end
     extra = nil,     -- optional fn(tbl) adding fields to the heartbeat
     shotPath = nil,  -- host path for screenshots (set by the game or smoke.sh convention)
+    errored = false, -- latched once the first error is written
 }
 
 function Harness.count(key, n)
@@ -33,7 +34,8 @@ function Harness.frame(frame, updateFn)
         return
     end
     local ok, err = pcall(updateFn)
-    if not ok then
+    if not ok and not Harness.errored then
+        Harness.errored = true -- keep the FIRST error; later frames repeat symptoms
         playdate.datastore.write({ err = tostring(err) }, "err")
     end
     if frame % 90 == 0 then

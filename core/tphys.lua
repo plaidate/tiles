@@ -6,6 +6,9 @@
 
 Phys = {}
 
+-- shared by bfs/firstStep/descend so the hot paths allocate nothing
+local DIRS = { { 1, 0 }, { -1, 0 }, { 0, 1 }, { 0, -1 } }
+
 -- default solidity = the map's; games pass their own isSolid(tx, ty) to
 -- add bombs, doors, water etc.
 local function defaultSolid(tx, ty)
@@ -60,12 +63,14 @@ end
 function Phys.moveAssist(a, dx, dy, isSolid)
     local hitX, hitY = Phys.move(a, dx, dy, isSolid)
     local solidFn = isSolid or defaultSolid
+    -- assist deliberately applies to cardinal input only (dy == 0 / dx == 0)
     if hitX and dy == 0 and dx ~= 0 then
         local tx, ty = Map.tileAt(a.x, a.y)
         if not solidFn(tx + Util.sign(dx), ty) then
             local off = Map.cy(ty) - a.y
             if off ~= 0 then
                 Phys.move(a, 0, Util.clamp(off, -math.abs(dx), math.abs(dx)), isSolid)
+                Phys.move(a, dx, 0, isSolid) -- retry the swallowed forward motion
             end
         end
     elseif hitY and dx == 0 and dy ~= 0 then
@@ -74,6 +79,7 @@ function Phys.moveAssist(a, dx, dy, isSolid)
             local off = Map.cx(tx) - a.x
             if off ~= 0 then
                 Phys.move(a, Util.clamp(off, -math.abs(dy), math.abs(dy)), 0, isSolid)
+                Phys.move(a, 0, dy, isSolid) -- retry the swallowed forward motion
             end
         end
     end
@@ -99,18 +105,19 @@ function Phys.bfs(sx, sy, isOpen)
     local dist = {}
     for y = 1, Map.H do dist[y] = {} end
     dist[sy][sx] = 0
-    local queue, head = { { sx, sy } }, 1
-    local dirs = { { 1, 0 }, { -1, 0 }, { 0, 1 }, { 0, -1 } }
-    while queue[head] do
-        local cx, cy = queue[head][1], queue[head][2]
+    -- parallel coordinate queues: no per-cell table allocations
+    local qx, qy, head, tail = { sx }, { sy }, 1, 1
+    while head <= tail do
+        local cx, cy = qx[head], qy[head]
         head = head + 1
         local d = dist[cy][cx] + 1
         for i = 1, 4 do
-            local nx, ny = cx + dirs[i][1], cy + dirs[i][2]
+            local nx, ny = cx + DIRS[i][1], cy + DIRS[i][2]
             if nx >= 1 and nx <= Map.W and ny >= 1 and ny <= Map.H
                 and dist[ny][nx] == nil and isOpen(nx, ny) then
                 dist[ny][nx] = d
-                queue[#queue + 1] = { nx, ny }
+                tail = tail + 1
+                qx[tail], qy[tail] = nx, ny
             end
         end
     end
@@ -123,11 +130,10 @@ end
 function Phys.firstStep(dist, tx, ty)
     local d = dist[ty] and dist[ty][tx]
     if not d or d == 0 then return nil end
-    local dirs = { { 1, 0 }, { -1, 0 }, { 0, 1 }, { 0, -1 } }
     while d > 1 do
         local moved = false
         for i = 1, 4 do
-            local nx, ny = tx + dirs[i][1], ty + dirs[i][2]
+            local nx, ny = tx + DIRS[i][1], ty + DIRS[i][2]
             if dist[ny] and dist[ny][nx] == d - 1 then
                 tx, ty, d = nx, ny, d - 1
                 moved = true
@@ -145,12 +151,11 @@ function Phys.descend(dist, sx, sy)
     local best = dist[sy] and dist[sy][sx]
     if not best then return nil end
     local bx, by
-    local dirs = { { 1, 0 }, { -1, 0 }, { 0, 1 }, { 0, -1 } }
     for i = 1, 4 do
-        local nx, ny = sx + dirs[i][1], sy + dirs[i][2]
+        local nx, ny = sx + DIRS[i][1], sy + DIRS[i][2]
         local d = dist[ny] and dist[ny][nx]
         if d and d < best then
-            best, bx, by = d, dirs[i][1], dirs[i][2]
+            best, bx, by = d, DIRS[i][1], DIRS[i][2]
         end
     end
     return bx, by

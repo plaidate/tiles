@@ -71,6 +71,8 @@ function Map.load(rows, ox, oy)
     Map.ox, Map.oy = ox or 0, oy or (240 - Map.H * Tiles.SIZE)
     Map.grid = {}
     for y = 1, Map.H do
+        assert(#rows[y] == Map.W,
+            "Map.load: row " .. y .. " is " .. #rows[y] .. " chars, expected " .. Map.W)
         Map.grid[y] = {}
         for x = 1, Map.W do
             Map.grid[y][x] = rows[y]:sub(x, x)
@@ -97,6 +99,7 @@ function Map.solid(tx, ty)
 end
 
 function Map.set(tx, ty, ch)
+    assert(Tiles.defs[ch], "Map.set: undefined tile char '" .. tostring(ch) .. "'")
     if not Map.grid[ty] or not Map.grid[ty][tx] then return end
     Map.grid[ty][tx] = ch
     if Map.bg then Map.repaint(tx, ty) end

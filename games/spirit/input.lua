@@ -14,11 +14,8 @@ function Input.poll()
         return
     end
     local pd = playdate
-    s.mx, s.my, s.sweep = 0, 0, false
-    if pd.buttonIsPressed(pd.kButtonLeft) then s.mx = -1 end
-    if pd.buttonIsPressed(pd.kButtonRight) then s.mx = 1 end
-    if pd.buttonIsPressed(pd.kButtonUp) then s.my = -1 end
-    if pd.buttonIsPressed(pd.kButtonDown) then s.my = 1 end
+    s.sweep = false
+    s.mx, s.my = Util.dpad()
     s.fire = pd.buttonIsPressed(pd.kButtonA)
     s.confirm = pd.buttonJustPressed(pd.kButtonA)
     Input.charge = Input.charge + math.abs(pd.getCrankChange())
